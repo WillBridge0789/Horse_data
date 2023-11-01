@@ -14,7 +14,7 @@ pd.options.plotting.backend = "plotly"
 
 # File path
 # file_path = #Path to the supplied CSV file "keesep_2023_results.csv"
-file_path = 'C:\\Users\\WILLIAM BURBRIDGE\\Downloads\\keepsep_2023_results.csv'
+file_path = "keepsep_2023_results.csv"
 
 
 # Your code here
