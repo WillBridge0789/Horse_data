@@ -8,13 +8,14 @@
 """
 # Need to install pandas library 
 import pandas as pd
+import plotly.express as px
 
 # Need to install plotly library 
 pd.options.plotting.backend = "plotly"
 
 # File path
 # file_path = #Path to the supplied CSV file "keesep_2023_results.csv"
-file_path = "keepsep_2023_results.csv"
+file_path = "keesep_2023_results.csv"
 
 
 # Your code here
@@ -23,19 +24,34 @@ df = pd.read_csv(file_path)
 
 # 2. Remove outs from the data
 df = df[df['out'] != 't']
+# print(df)
 
 # 3. Total sale for the top 10 sires by gross sale price
-top_10_sires = df.groupby('sire').sum().sort_values(by='price', ascending=False).head(10)
-fig1 = top_10_sires['price'].plot.bar(title='Total Sales for the Top 10 Sires by Total Sale Price')
+top_10_sires = df.groupby('sire_name').sum().sort_values(by='sale_price', ascending=False).head(10)
+fig1 = top_10_sires['sale_price'].plot.bar(title='Total Sales for the Top 10 Sires by Total Sale Price')
+print(top_10_sires)
+fig1.show()
+
 
 # 4. Avg sale price for top 10 buyers by gross sale price
-top_10_buyers = df.groupby('buyer').mean().sort_values(by='price', ascending=False).head(10)
-fig2 = top_10_buyers['price'].plot.bar(title='Avg Sale Price for the Top 10 Buyers by Total Sale Price')
+top_10_buyers = df.groupby(['buyer'])['sale_price'].mean().sort_values(ascending=False).head(10)
+# Creates a new DataFrame with the buyer names and average sale prices
+top_10_buyers_df = pd.DataFrame({
+    'buyer': top_10_buyers.index, # Show buyers column by index
+    'average_sale_price': top_10_buyers.values # Use values of series for average sale prices
+})
+# Displays data in line chart
+fig4 = px.line(top_10_buyers_df, x='buyer', y='average_sale_price', title='Avg Sale Price for the Top 10 Buyers by Gross Sale Price')
+fig4.show()
 
 # 5. Avg sale price by book by sex
-fig3 = df.groupby(['book', 'sex']).mean()['price'].unstack().plot.bar(title='Avg Sale Price by Book and Sex')
+pivot_table = df.groupby(['book', 'sex'])['sale_price'].mean().unstack()
+
+fig5 = px.bar(pivot_table, title='Avg Sale Price by Book and Sex')
+fig5.show()
 
 # 6. Avg sale price by month of birth
-df['month_of_birth'] = pd.to_datetime(df['foal_date']).dt.month
-fig4 = df.groupby('month_of_birth').mean()['price'].plot.bar(title='Avg Sale Price by Month of Birth')
+avg_price_by_dob = df.groupby('dob')['sale_price'].mean().reset_index()
 
+fig6 = px.bar(avg_price_by_dob, x='dob', y='sale_price', title='Avg Sale Price by Date of Birth', labels={'dob': 'Date of Birth'})
+fig6.show()
